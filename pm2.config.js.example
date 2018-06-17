@@ -6,6 +6,7 @@ module.exports = {
             PORT    : 8888,
             NODE_ENV: 'production',
             MIKROTIK_ADDRESS: '<your mikrotik IP>',
+            MIKROTIK_API_PORT: 8728,
             MIKROTIK_USERNAME: '<your mikrotik username>',
             MIKROTIK_PASSWORD: '<your mikrotik password>',
             MIKROTIK_ADDRESS_LIST: '<your mikrotik address list>'

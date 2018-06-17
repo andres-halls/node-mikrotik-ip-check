@@ -2,6 +2,7 @@ const http = require('http');
 const MikroNode = require('mikronode-ng');
 
 const host = process.env.MIKROTIK_ADDRESS;
+const port = process.env.MIKROTIK_API_PORT || 8728;
 if (!host) return console.error('MIKROTIK_ADDRESS missing from env!');
 const username = process.env.MIKROTIK_USERNAME;
 if (!username) return console.error('MIKROTIK_USERNAME missing from env!');
@@ -13,7 +14,7 @@ if (!listName) return console.error('MIKROTIK_ADDRESS_LIST missing from env!');
 const server = http.createServer(async function (req, res) {
     try {
         const requestIP = req.headers['x-real-ip'] || req.connection.remoteAddress;
-        const connection = MikroNode.getConnection(host, username, password, {closeOnDone: true});
+        const connection = MikroNode.getConnection(host, username, password, {port, closeOnDone: true});
         const conn = await connection.getConnectPromise();
         const addressList = await conn.getCommandPromise('/ip/firewall/address-list/print');
 
