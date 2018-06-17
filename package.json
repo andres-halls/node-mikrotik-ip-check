@@ -1,0 +1,15 @@
+{
+  "name": "node-mikrotik-ip-check",
+  "version": "1.0.0",
+  "description": "Checks if request IP is in mikrotik firewall allowed IP list",
+  "main": "index.js",
+  "repository": "https://github.com/andres-liiver/node-mikrotik-ip-check",
+  "author": "andres-liiver <andres.liiver@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "mikronode-ng": "^1.0.11"
+  },
+  "scripts": {
+    "start": "node ."
+  }
+}

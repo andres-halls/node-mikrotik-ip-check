@@ -1,0 +1,18 @@
+module.exports = {
+    apps : {
+        name        : 'node-mikrotik-ip-check',
+        script      : 'index.js',
+        env: {
+            PORT    : 8888,
+            NODE_ENV: 'production',
+            MIKROTIK_ADDRESS: '<your mikrotik IP>',
+            MIKROTIK_USERNAME: '<your mikrotik username>',
+            MIKROTIK_PASSWORD: '<your mikrotik password>',
+            MIKROTIK_ADDRESS_LIST: '<your mikrotik address list>'
+        },
+        exec_mode   : 'fork',
+        instances   : 1,
+        min_uptime  : '60s',
+        max_restarts: 5
+    }
+}
