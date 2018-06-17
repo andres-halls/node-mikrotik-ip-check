@@ -2,6 +2,7 @@
 Checks if request IP is in mikrotik firewall allowed IP list.
 
 ## Installation
+1. Enable the Mikrotik API: `/ip service enable api`, default port is 8728.
 1. git pull this repo
 1. `yarn` or `npm install`
 1. Copy the pm2.config.js.example as pm2.config.js
