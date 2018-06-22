@@ -29,7 +29,8 @@ const server = http.createServer(async function (req, res) {
         res.end();
     } catch (err) {
         console.error(err);
-        res.statusCode(500).end();
+        res.statusCode = 500;
+        res.end();
     }
 });
 
