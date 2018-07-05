@@ -13,18 +13,19 @@ if (!listName) return console.error('MIKROTIK_ADDRESS_LIST missing from env!');
 
 const server = http.createServer(async function (req, res) {
     try {
+        const requestURL = req.headers['host'] + req.headers['x-original-uri'];
         const requestIP = req.headers['x-real-ip'] || req.connection.remoteAddress;
         const connection = MikroNode.getConnection(host, username, password, {port, closeOnDone: true});
         const conn = await connection.getConnectPromise();
         const addressList = await conn.getCommandPromise('/ip/firewall/address-list/print');
 
         if (addressList.find(ip => ip.address === requestIP && ip.disabled === 'false' && ip.list === listName)) {
-            console.log('IP %s allowed', requestIP);
+            console.log('Requested URL: %s. IP %s allowed', requestURL, requestIP);
             res.statusCode = 200;
             return res.end();
         }
 
-        console.log('IP %s not allowed', requestIP);
+        console.log('Requested URL: %s. IP %s not allowed', requestURL, requestIP);
         res.statusCode = 403;
         res.end();
     } catch (err) {
