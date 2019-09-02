@@ -9,7 +9,8 @@ module.exports = {
             MIKROTIK_API_PORT: 8728,
             MIKROTIK_USERNAME: '<your mikrotik username>',
             MIKROTIK_PASSWORD: '<your mikrotik password>',
-            MIKROTIK_ADDRESS_LIST: '<your mikrotik address list>'
+            MIKROTIK_ADDRESS_LIST: '<your mikrotik address list>',
+            TRUSTED_IPS: '' // separate with spaces
         },
         exec_mode   : 'fork',
         instances   : 1,

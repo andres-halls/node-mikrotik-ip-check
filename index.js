@@ -1,5 +1,6 @@
 const http = require('http');
 const MikroNode = require('mikronode-ng');
+const chalk = require('chalk');
 
 const host = process.env.MIKROTIK_ADDRESS;
 const port = process.env.MIKROTIK_API_PORT || 8728;
@@ -10,6 +11,7 @@ const password = process.env.MIKROTIK_PASSWORD;
 if (!password) return console.error('MIKROTIK_PASSWORD missing from env!');
 const listName = process.env.MIKROTIK_ADDRESS_LIST;
 if (!listName) return console.error('MIKROTIK_ADDRESS_LIST missing from env!');
+const trusted_ips = process.env.TRUSTED_IPS.split(' ') || [];
 
 const server = http.createServer(async function (req, res) {
     try {
@@ -20,12 +22,16 @@ const server = http.createServer(async function (req, res) {
         const addressList = await conn.getCommandPromise('/ip/firewall/address-list/print');
 
         if (addressList.find(ip => ip.address === requestIP && ip.disabled === 'false' && ip.list === listName)) {
-            console.log('Requested URL: %s. IP %s allowed', requestURL, requestIP);
+            if (!trusted_ips.find(ip => ip === requestIP)) {
+                console.log(chalk`{yellow [!]} IP {bold ${requestIP}} allowed, but not in TRUSTED_IPS.`);
+                console.log(`\tRequested URL: ${requestURL}`);
+            }
             res.statusCode = 200;
             return res.end();
         }
 
-        console.log('Requested URL: %s. IP %s not allowed', requestURL, requestIP);
+        console.log(chalk`{red [!]} IP {bold ${requestIP}} not allowed.`);
+        console.log(`\tRequested URL: ${requestURL}`);
         res.statusCode = 403;
         res.end();
     } catch (err) {
