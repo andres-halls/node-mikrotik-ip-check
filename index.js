@@ -11,7 +11,8 @@ const password = process.env.MIKROTIK_PASSWORD;
 if (!password) return console.error('MIKROTIK_PASSWORD missing from env!');
 const listName = process.env.MIKROTIK_ADDRESS_LIST;
 if (!listName) return console.error('MIKROTIK_ADDRESS_LIST missing from env!');
-const trusted_ips = process.env.TRUSTED_IPS.split(' ') || [];
+let trusted_ips = [];
+if (process.env.TRUSTED_IPS) trusted_ips = process.env.TRUSTED_IPS.split(' ');
 
 const server = http.createServer(async function (req, res) {
     try {
