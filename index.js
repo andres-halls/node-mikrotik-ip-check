@@ -36,7 +36,7 @@ const server = http.createServer(async function (req, res) {
         res.statusCode = 403;
         res.end();
     } catch (err) {
-        console.error(err);
+        console.error(err.toString());
         res.statusCode = 500;
         res.end();
     }
