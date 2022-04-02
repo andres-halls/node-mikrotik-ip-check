@@ -1,6 +1,6 @@
 {
   "name": "node-mikrotik-ip-check",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Checks if request IP is in mikrotik firewall allowed IP list",
   "main": "index.js",
   "type": "module",
