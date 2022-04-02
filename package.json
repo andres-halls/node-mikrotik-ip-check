@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "description": "Checks if request IP is in mikrotik firewall allowed IP list",
   "main": "index.js",
+  "type": "module",
   "repository": "https://github.com/andres-liiver/node-mikrotik-ip-check",
   "author": "andres-liiver <andres.liiver@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "chalk": "^2.4.2",
-    "mikronode-ng": "git+https://github.com/germon/mikronode-ng.git"
+    "chalk-template": "^0.4.0",
+    "ip6addr": "^0.2.5",
+    "splynx-mikronode-ng2": "^1.0.12"
   },
   "scripts": {
     "start": "node ."
