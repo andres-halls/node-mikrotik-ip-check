@@ -13,42 +13,14 @@ if (!PASSWORD) throw new Error('MIKROTIK_PASSWORD missing from env!');
 const LISTNAME = process.env.MIKROTIK_ADDRESS_LIST;
 if (!LISTNAME) throw new Error('MIKROTIK_ADDRESS_LIST missing from env!');
 
+let addressListCache = {stale: true};
+
 const server = http.createServer(async (req, res) => {
   try {
+    const {ipv4List, ipv6List} = await getAddressLists();
     const requestUrl = req.headers['host'] + req.headers['x-original-uri'];
     let requestIP = req.headers['x-real-ip'] || req.connection.remoteAddress;
     requestIP = ip6addr.parse(requestIP);
-    const options = {PORT, closeOnDone: true, timeout: 5, closeOnTimeout: true};
-    const connection = MikroNode.getConnection(HOST, USERNAME, PASSWORD, options);
-    const conn = await connection.getConnectPromise();
-    let ipv4List = conn.getCommandPromise('/ip/firewall/address-list/print');
-    let ipv6List = conn.getCommandPromise('/ipv6/firewall/address-list/print');
-    [ipv4List, ipv6List] = await Promise.all([ipv4List, ipv6List]);
-
-    ipv4List = ipv4List
-      .filter(ip => ip.list === LISTNAME && ip.disabled === 'false')
-      .filter(ip => {
-        try {
-          ip6addr.parse(ip.address);
-          return true;
-        } catch (err) {
-          return false;
-        }
-      })
-      .map(ip => ip6addr.parse(ip.address));
-
-    ipv6List = ipv6List
-      .filter(ip => ip.list === LISTNAME && ip.disabled === 'false')
-      .filter(ip => {
-        try {
-          ip6addr.createCIDR(ip.address);
-          return true;
-        } catch (err) {
-          return false;
-        }
-      })
-      .map(ip => ip6addr.createCIDR(ip.address));
-
     let allowed = false;
 
     if (requestIP.kind() === 'ipv4') {
@@ -74,6 +46,58 @@ const server = http.createServer(async (req, res) => {
     res.end();
   }
 });
+
+async function getAddressLists() {
+  if (!addressListCache.stale) {
+    return {
+      ipv4List: addressListCache.ipv4List,
+      ipv6List: addressListCache.ipv6List
+    };
+  }
+
+  const options = {PORT, closeOnDone: true, timeout: 5, closeOnTimeout: true};
+  const connection = MikroNode.getConnection(HOST, USERNAME, PASSWORD, options);
+  const conn = await connection.getConnectPromise();
+  let ipv4List = conn.getCommandPromise('/ip/firewall/address-list/print');
+  let ipv6List = conn.getCommandPromise('/ipv6/firewall/address-list/print');
+  [ipv4List, ipv6List] = await Promise.all([ipv4List, ipv6List]);
+
+  ipv4List = ipv4List
+    .filter(ip => ip.list === LISTNAME && ip.disabled === 'false')
+    .filter(ip => {
+      try {
+        ip6addr.parse(ip.address);
+        return true;
+      } catch (err) {
+        return false;
+      }
+    })
+    .map(ip => ip6addr.parse(ip.address));
+
+  ipv6List = ipv6List
+    .filter(ip => ip.list === LISTNAME && ip.disabled === 'false')
+    .filter(ip => {
+      try {
+        ip6addr.createCIDR(ip.address);
+        return true;
+      } catch (err) {
+        return false;
+      }
+    })
+    .map(ip => ip6addr.createCIDR(ip.address));
+
+  addressListCache = {
+    ipv4List,
+    ipv6List,
+    stale: false
+  };
+
+  setTimeout(() => {
+    addressListCache.stale = true;
+  }, 5 * 60 * 1000);
+
+  return {ipv4List, ipv6List};
+}
 
 server.listen(process.env.PORT || 8888, (err) => {
   if (err) return console.error(err);
